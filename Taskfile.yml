@@ -1,0 +1,49 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task dev
+    silent: true
+  # install deps
+  install-deps:
+    cmds:
+      - npm --prefix web install
+      - go mod download
+  # run frontend build
+  build-frontend:
+    cmds:
+      - npm --prefix web run build
+  # build backend for air
+  build-backend:
+    cmds:
+      - go build -o ./build/svelte_app ./cmd/svelte_app
+  # build binary
+  build:
+    deps:
+      - build-frontend
+    cmds:
+      - task build-backend
+  # start frontend and backend watchers in parallel
+  dev:
+    env:
+      # this is for live reloading :)
+      APP_ENV: local
+    deps:
+      - build-frontend
+    cmds:
+      - task -p watch-frontend watch-backend
+  # start hmr server for vite
+  watch-frontend:
+    cmds:
+      - npm --prefix web run dev
+  # watch for backend changes and re-build using air
+  watch-backend:
+    env:
+      APP_ENV: local
+    deps:
+      - build-frontend
+    cmds:
+      - go run github.com/air-verse/air@latest .
