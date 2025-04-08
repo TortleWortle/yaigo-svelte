@@ -61,7 +61,7 @@ func newInertiaServer(frontend fs.FS, useDevServer bool) (*yaigo.Server, error) 
 	var opts []yaigo.OptFunc
 
 	if useDevServer {
-		opts = append(opts, yaigo.WithViteDevServer("http://localhost:5173", false))
+		opts = append(opts, yaigo.WithViteDevServer("http://localhost:5173", false), yaigo.WithTypeGen("./web/src/types"))
 	}
 
 	t := web.RootTemplateFn
